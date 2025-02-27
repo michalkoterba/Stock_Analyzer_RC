@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Items</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+{% include 'menu.html' %}
+
+<div class="container mt-5">
+  <h2 class="text-center">Items</h2>
+  <form method="GET" class="mb-3">
+    <label for="start_date">Start Date:</label>
+    <input type="date" name="start_date" value="{{ start_date }}" required>
+    <label for="end_date">End Date:</label>
+    <input type="date" name="end_date" value="{{ end_date }}" required>
+    <button type="submit" class="btn btn-primary">Filter</button>
+  </form>
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Item Code</th>
+      <th>Description</th>
+      <th>Total Purchase Value</th>
+      <th>Lowest Price</th>
+      <th>Highest Price</th>
+      <th>Average Price</th>
+      <th>Last Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in items %}
+    <tr>
+      <td>{{ item[0] }}</td>
+      <td><a href="{{ url_for('item_purchases', item_code=item[0]) }}">{{ item[1] }}</a></td>
+      <td>{{ item[2] }}</td>
+      <td>{{ item[3] }}</td>
+      <td>{{ item[4] }}</td>
+      <td>{{ item[5] }}</td>
+      <td>{{ item[6] }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td colspan="2" class="text-end"><strong>Total:</strong></td>
+      <td><strong>{{ total_sum }}</strong></td>
+      <td colspan="4"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
