@@ -1,8 +1,11 @@
-# Use the official Python 13.3 image based on Ubuntu as a base image
-FROM python:3.13.3-ubuntu
+# Use the official Python 13.3 image based on Alpine as a base image
+FROM python:3.13-alpine
 
 # Set the working directory
 WORKDIR /app
+
+# Install the required packages
+RUN apk update && apk add --no-cache postgresql-dev gcc python3-dev musl-dev
 
 # Copy the requirements file into the container
 COPY requirements.txt .
