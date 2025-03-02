@@ -1,0 +1,32 @@
+services:
+  flask_app:
+    image: stock_analyzer_rc
+    container_name: Stock_Analyzer_RC
+    build: .
+    # ports:
+    #   - "5000:5000"
+    #command: python /Flask_app/app.py
+    restart: unless-stopped
+
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    # ports:
+    #   - "5432:5432"
+    restart: unless-stopped
+
+  tunnel:
+    image: cloudflare/cloudflared
+    container_name: cloudflared_Stock_Analyzer_RC
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    environment:
+      TUNNEL_TOKEN: ${TUNEL_TOKEN}
+volumes:
+  postgres:
