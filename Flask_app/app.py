@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 import psycopg2
 import os
 from dotenv import load_dotenv
@@ -139,6 +139,10 @@ def get_item_purchases(item_code):
     conn.close()
     return item_name, purchases
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory('static', 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
 @app.route('/')
 def index():
     return redirect(url_for('items'))
@@ -168,4 +172,4 @@ def invoice_details(invoice_id):
     return render_template('invoice_details.html', invoice_info=invoice_info, items=items, total_sum=total_sum)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
