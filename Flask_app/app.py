@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import psycopg2
 import os
 from dotenv import load_dotenv
@@ -141,10 +141,14 @@ def get_item_purchases(item_code):
 
 @app.route('/')
 def index():
+    return redirect(url_for('items'))
+
+@app.route('/invoices')
+def invoices():
     start_date = request.args.get('start_date', '2000-01-01')
     end_date = request.args.get('end_date', '2100-01-01')
     invoices, total_sum = get_invoices(start_date, end_date)
-    return render_template('index.html', invoices=invoices, total_sum=total_sum, start_date=start_date, end_date=end_date)
+    return render_template('invoices.html', invoices=invoices, total_sum=total_sum, start_date=start_date, end_date=end_date)
 
 @app.route('/items')
 def items():
