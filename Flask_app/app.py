@@ -55,9 +55,9 @@ def get_items(start_date, end_date):
     cursor.execute("""
         SELECT items.item_code, items.description, 
                TO_CHAR(SUM(invoice_items.quantity * invoice_items.price), 'FM999G999G990D00') || 'zł' AS total_value,
-               TO_CHAR(MIN(invoice_items.price), 'FM999G999G990D00') || 'zł' AS lowest_price,
-               TO_CHAR(MAX(invoice_items.price), 'FM999G999G990D00') || 'zł' AS highest_price,
-               TO_CHAR(AVG(invoice_items.price), 'FM999G999G990D00') || 'zł' AS average_price,
+               TO_CHAR(MIN(invoice_items.price) FILTER (WHERE invoices.issue_date BETWEEN %s AND %s), 'FM999G999G990D00') || 'zł' AS lowest_price,
+               TO_CHAR(MAX(invoice_items.price) FILTER (WHERE invoices.issue_date BETWEEN %s AND %s), 'FM999G999G990D00') || 'zł' AS highest_price,
+               TO_CHAR(AVG(invoice_items.price) FILTER (WHERE invoices.issue_date BETWEEN %s AND %s), 'FM999G999G990D00') || 'zł' AS average_price,
                TO_CHAR((SELECT price FROM invoice_items WHERE item_id = items.id ORDER BY id DESC LIMIT 1), 'FM999G999G990D00') || 'zł' AS last_price
         FROM items 
         JOIN invoice_items ON items.id = invoice_items.item_id 
@@ -65,7 +65,7 @@ def get_items(start_date, end_date):
         WHERE invoices.issue_date BETWEEN %s AND %s
         GROUP BY items.item_code, items.description, items.id 
         ORDER BY SUM(invoice_items.quantity * invoice_items.price) DESC
-    """, (start_date, end_date))
+    """, (start_date, end_date, start_date, end_date, start_date, end_date, start_date, end_date))
     items = cursor.fetchall()
 
     cursor.execute("""
