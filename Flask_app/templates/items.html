@@ -6,7 +6,25 @@
   <title>Invoices</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
+  <style>
+    th {
+      cursor: pointer;
+      position: relative;
+    }
+    th::after {
+      content: " ▼";
+      font-size: 0.8em;
+      visibility: hidden;
+    }
+    th.sorted-asc::after {
+      content: " ▲";
+      visibility: visible;
+    }
+    th.sorted-desc::after {
+      content: " ▼";
+      visibility: visible;
+    }
+  </style>
 </head>
 <body>
 
@@ -20,18 +38,18 @@
     <label for="end_date">End Date:</label>
     <input type="date" name="end_date" value="{{ end_date }}" required>
     <button type="submit" class="btn btn-primary">Filter</button>
-
   </form>
-  <table class="table table-striped">
+
+  <table class="table table-striped" id="sortableTable">
     <thead>
     <tr>
-      <th>Item Code</th>
-      <th>Description</th>
-      <th>Total Purchase Value</th>
-      <th>Lowest Price</th>
-      <th>Highest Price</th>
-      <th>Average Price</th>
-      <th>Last Price</th>
+      <th onclick="sortTable(0)">Item Code</th>
+      <th onclick="sortTable(1)">Description</th>
+      <th onclick="sortTable(2)">Total Purchase Value</th>
+      <th onclick="sortTable(3)">Lowest Price</th>
+      <th onclick="sortTable(4)">Highest Price</th>
+      <th onclick="sortTable(5)">Average Price</th>
+      <th onclick="sortTable(6)">Last Price</th>
     </tr>
     </thead>
     <tbody>
@@ -46,6 +64,8 @@
       <td>{{ item[6] }}</td>
     </tr>
     {% endfor %}
+    </tbody>
+    <tbody>
     <tr>
       <td colspan="2" class="text-end"><strong>Total:</strong></td>
       <td><strong>{{ total_sum }}</strong></td>
@@ -54,5 +74,47 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  function sortTable(columnIndex) {
+      let table = document.getElementById("sortableTable");
+      let tbody = table.querySelector("tbody");
+      let rows = Array.from(tbody.querySelectorAll("tr"));
+
+      let header = table.querySelectorAll("th")[columnIndex];
+      let isAscending = header.classList.contains("sorted-asc");
+
+      // Remove sorting indicators from all headers
+      table.querySelectorAll("th").forEach(th => th.classList.remove("sorted-asc", "sorted-desc"));
+
+      rows.sort((rowA, rowB) => {
+          let cellA = rowA.cells[columnIndex].innerText.trim();
+          let cellB = rowB.cells[columnIndex].innerText.trim();
+
+          // Function to clean and convert currency to float
+          function cleanCurrency(value) {
+              return parseFloat(value.replace("zł", "").replace(",", "").trim()) || 0;
+          }
+
+          let numA = cleanCurrency(cellA);
+          let numB = cleanCurrency(cellB);
+
+          // Sort numerically if values are numbers, otherwise use localeCompare
+          if (!isNaN(numA) && !isNaN(numB)) {
+              return isAscending ? numB - numA : numA - numB;
+          } else {
+              return isAscending ? cellB.localeCompare(cellA) : cellA.localeCompare(cellB);
+          }
+      });
+
+      // Toggle sorting direction
+      header.classList.add(isAscending ? "sorted-desc" : "sorted-asc");
+
+      // Re-append sorted rows
+      tbody.append(...rows);
+  }
+</script>
+
+
 </body>
 </html>
